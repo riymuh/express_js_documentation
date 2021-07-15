@@ -2,9 +2,9 @@ const sql = require("./db.js");
 
 // constructor
 const Product = function (product) {
-  this.email = product.email;
   this.name = product.name;
-  this.active = product.active;
+  this.price = product.price;
+  this.quantity = product.quantity;
 };
 
 Product.create = (newProduct, result) => {
@@ -54,7 +54,7 @@ Product.getAll = (result) => {
 
 Product.updateById = (id, product, result) => {
   sql.query(
-    "UPDATE products SET email = ?, name = ?, active = ? WHERE id = ?",
+    "UPDATE products SET name = ?, price = ?, quantity = ? WHERE id = ?",
     [product.email, product.name, product.active, id],
     (err, res) => {
       if (err) {

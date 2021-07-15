@@ -1,21 +1,28 @@
-const Customer = require("../models/product.model.js");
+const Product = require("../models/product.model.js");
 
-// Create and Save a new Customer
+// Create and Save a new Product
 exports.create = (req, res) => {};
 
-// Retrieve all Customers from the database.
+// Retrieve all Products from the database.
 exports.findAll = (req, res) => {
-  return res.json("hello");
+  Product.getAll((err, data) => {
+    if (err)
+      res.status(500).send({
+        message:
+          err.message || "Some error occurred while retrieving customers.",
+      });
+    else res.send(data);
+  });
 };
 
-// Find a single Customer with a productId
+// Find a single Product with a productId
 exports.findOne = (req, res) => {};
 
-// Update a Customer identified by the productId in the request
+// Update a Product identified by the productId in the request
 exports.update = (req, res) => {};
 
-// Delete a Customer with the specified productId in the request
+// Delete a Product with the specified productId in the request
 exports.delete = (req, res) => {};
 
-// Delete all Customers from the database.
+// Delete all Products from the database.
 exports.deleteAll = (req, res) => {};
