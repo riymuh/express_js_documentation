@@ -9,12 +9,12 @@ router.post("/", Users.create);
 router.get("/", Users.findAll);
 
 // Retrieve a single User with UserId
-router.get("/:UserId", Users.findOne);
+router.get("/:userId", Users.findOne);
 
 // Update a User with UserId
-router.put("/:UserId", Users.update);
+router.put("/:userId", Users.update);
 
 // Delete a User with UserId
-router.delete("/:UserId", Users.delete);
+router.delete("/:userId", Users.delete);
 
 module.exports = router;

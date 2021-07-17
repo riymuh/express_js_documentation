@@ -3,8 +3,8 @@ const sql = require("./db.js");
 // constructor
 const User = function (user) {
   this.name = user.name;
-  this.price = user.price;
-  this.quantity = user.quantity;
+  this.email = user.email;
+  this.phone = user.phone;
 };
 
 User.create = (newUser, result) => {
