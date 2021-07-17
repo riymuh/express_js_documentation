@@ -20,9 +20,15 @@ exports.create = (req, res) => {
   // Save User in the database
   User.create(user, (err, data) => {
     if (err) {
-      res.status(500).send({
+      result = {
+        param: {
+          user_id: req.params.userId,
+        },
+        status: false,
         message: err.message || "Some error occurred while creating the User.",
-      });
+        result: null,
+      };
+      res.status(500).send(result);
     } else {
       var result = [];
       var transformData = {
@@ -47,9 +53,15 @@ exports.create = (req, res) => {
 exports.findAll = (req, res) => {
   User.getAll((err, data) => {
     if (err) {
-      res.status(500).send({
+      result = {
+        param: {
+          user_id: req.params.userId,
+        },
+        status: false,
         message: err.message || "Some error occurred while retrieving users.",
-      });
+        result: null,
+      };
+      res.status(500).send(result);
     } else {
       var result = [];
       var transformData = [];
@@ -79,19 +91,31 @@ exports.findAll = (req, res) => {
 
 // Find a single User with a productId
 exports.findOne = (req, res) => {
+  var result = [];
   User.findById(req.params.userId, (err, data) => {
     if (err) {
       if (err.kind === "not_found") {
-        res.status(404).send({
+        result = {
+          param: {
+            user_id: req.params.userId,
+          },
+          status: false,
           message: `Not found User with id ${req.params.userId}.`,
-        });
+          result: null,
+        };
+        res.status(404).send(result);
       } else {
-        res.status(500).send({
+        result = {
+          param: {
+            user_id: req.params.userId,
+          },
+          status: false,
           message: "Error retrieving user with id " + req.params.userId,
-        });
+          result: null,
+        };
+        res.status(500).send(result);
       }
     } else {
-      var result = [];
       var transformData = {
         user_id: data.id,
         name: data.name,
@@ -122,18 +146,30 @@ exports.update = (req, res) => {
   }
 
   User.updateById(req.params.userId, new User(req.body), (err, data) => {
+    var result = [];
     if (err) {
       if (err.kind === "not_found") {
-        res.status(404).send({
+        result = {
+          param: {
+            user_id: req.params.userId,
+          },
+          status: false,
           message: `Not found User with id ${req.params.userId}.`,
-        });
+          result: null,
+        };
+        res.status(404).send(result);
       } else {
-        res.status(500).send({
+        result = {
+          param: {
+            user_id: req.params.userId,
+          },
+          status: false,
           message: "Error updating User with id " + req.params.userId,
-        });
+          result: null,
+        };
+        res.status(500).send(result);
       }
     } else {
-      var result = [];
       var transformData = {
         user_id: data.id,
         name: data.name,
@@ -156,20 +192,31 @@ exports.update = (req, res) => {
 
 // Delete a User with the specified userId in the request
 exports.delete = (req, res) => {
+  var result = [];
   User.remove(req.params.userId, (err, data) => {
     if (err) {
       if (err.kind === "not_found") {
-        res.status(404).send({
-          message: `Not found Userr with id ${req.params.userId}.`,
-        });
+        result = {
+          param: {
+            user_id: req.params.userId,
+          },
+          status: false,
+          message: `Not found User with id ${req.params.userId}.`,
+          result: null,
+        };
+        res.status(404).send(result);
       } else {
-        res.status(500).send({
+        result = {
+          param: {
+            user_id: req.params.userId,
+          },
+          status: false,
           message: "Could not delete User with id " + req.params.userId,
-        });
+          result: null,
+        };
+        res.status(500).send(result);
       }
     } else {
-      var result = [];
-
       result = {
         param: {
           user_id: req.params.userId,
