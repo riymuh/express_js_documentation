@@ -1,24 +1,8 @@
-const UserTransfomer;
+var fractal = require("fractal-transformer")();
 
-UserTransfomer.collection = (users, result) => {
-    var result = [];
-    var transformData = [];
-
-    users.forEach((element) => {
-      var singleData = {
-        id: element.id,
-        name: element.name,
-        email: element.email,
-        phone: element.phone,
-      };
-      transformData.push(singleData);
-    });
-
-    result = {
-      param: null,
-      status: true,
-      result: transformData,
-    };
+module.exports = {
+  user_id: "id",
+  name: "name",
+  email: "email",
+  phone_number: "phone_number",
 };
-
-module.exports = UserTransfomer;

@@ -1,234 +1,162 @@
-const User = require("../models/user.model.js");
-//const UserTransformer = require("../transformer/user.transformer.js");
+const db = require("../models");
+var fractal = require("fractal-transformer")();
+var { userTransformer } = require("../transformers/");
+const User = db.users;
+const Op = db.Sequelize.Op;
 
-// Create and Save a new User
-exports.create = (req, res) => {
-  // Validate request
-  if (!req.body) {
-    res.status(400).send({
-      message: "Content can not be empty!",
-    });
-  }
+exports.getUsers = async function (req, res, next) {
+  try {
+    const users = await User.findAll({});
+    if (users.length !== 0) {
+      var dataTransformed = fractal(users, userTransformer);
 
-  // Create a User
-  const user = new User({
-    email: req.body.email,
-    name: req.body.name,
-    phone: req.body.phone,
-  });
-
-  // Save User in the database
-  User.create(user, (err, data) => {
-    if (err) {
-      result = {
-        param: {
-          user_id: req.params.userId,
-        },
-        status: false,
-        message: err.message || "Some error occurred while creating the User.",
-        result: null,
-      };
-      res.status(500).send(result);
-    } else {
-      var result = [];
-      var transformData = {
-        user_id: data.id,
-        name: data.name,
-        email: data.email,
-        phone: data.phone,
-      };
-
-      result = {
-        param: null,
-        status: true,
-        message: `User was created successfully!`,
-        result: transformData,
-      };
-      res.send(result);
-    }
-  });
-};
-
-// Retrieve all Users from the database.
-exports.findAll = (req, res) => {
-  User.getAll((err, data) => {
-    if (err) {
-      result = {
-        param: {
-          user_id: req.params.userId,
-        },
-        status: false,
-        message: err.message || "Some error occurred while retrieving users.",
-        result: null,
-      };
-      res.status(500).send(result);
-    } else {
-      var result = [];
-      var transformData = [];
-
-      //transform data
-      data.forEach((element) => {
-        var singleData = {
-          user_id: element.id,
-          name: element.name,
-          email: element.email,
-          phone: element.phone,
-        };
-        transformData.push(singleData);
+      res.json({
+        status: "OK",
+        messages: "",
+        results: dataTransformed,
       });
-
-      result = {
-        param: null,
-        status: true,
-        message: `Users found!`,
-        result: transformData,
-      };
-
-      res.send(result);
-    }
-  });
-};
-
-// Find a single User with a productId
-exports.findOne = (req, res) => {
-  var result = [];
-  User.findById(req.params.userId, (err, data) => {
-    if (err) {
-      if (err.kind === "not_found") {
-        result = {
-          param: {
-            user_id: req.params.userId,
-          },
-          status: false,
-          message: `Not found User with id ${req.params.userId}.`,
-          result: null,
-        };
-        res.status(404).send(result);
-      } else {
-        result = {
-          param: {
-            user_id: req.params.userId,
-          },
-          status: false,
-          message: "Error retrieving user with id " + req.params.userId,
-          result: null,
-        };
-        res.status(500).send(result);
-      }
     } else {
-      var transformData = {
-        user_id: data.id,
-        name: data.name,
-        email: data.email,
-        phone: data.phone,
-      };
-
-      result = {
-        param: {
-          user_id: req.params.userId,
-        },
-        status: true,
-        message: `User found!`,
-        result: transformData,
-      };
-      res.send(result);
+      res.json({
+        status: "ERROR",
+        messages: "EMPTY",
+        data: {},
+      });
     }
-  });
-};
-
-// Update a User identified by the userId in the request
-exports.update = (req, res) => {
-  // Validate Request
-  if (!req.body) {
-    res.status(400).send({
-      message: "Content can not be empty!",
+  } catch (err) {
+    res.json({
+      status: "ERROR",
+      messages: err.message,
+      results: {},
     });
   }
-
-  User.updateById(req.params.userId, new User(req.body), (err, data) => {
-    var result = [];
-    if (err) {
-      if (err.kind === "not_found") {
-        result = {
-          param: {
-            user_id: req.params.userId,
-          },
-          status: false,
-          message: `Not found User with id ${req.params.userId}.`,
-          result: null,
-        };
-        res.status(404).send(result);
-      } else {
-        result = {
-          param: {
-            user_id: req.params.userId,
-          },
-          status: false,
-          message: "Error updating User with id " + req.params.userId,
-          result: null,
-        };
-        res.status(500).send(result);
-      }
-    } else {
-      var transformData = {
-        user_id: data.id,
-        name: data.name,
-        email: data.email,
-        phone: data.phone,
-      };
-
-      result = {
-        param: {
-          user_id: req.params.userId,
-        },
-        status: true,
-        message: `User was updated successfully!`,
-        result: transformData,
-      };
-      res.send(result);
-    }
-  });
 };
 
-// Delete a User with the specified userId in the request
-exports.delete = (req, res) => {
-  var result = [];
-  User.remove(req.params.userId, (err, data) => {
-    if (err) {
-      if (err.kind === "not_found") {
-        result = {
-          param: {
-            user_id: req.params.userId,
-          },
-          status: false,
-          message: `Not found User with id ${req.params.userId}.`,
-          result: null,
-        };
-        res.status(404).send(result);
-      } else {
-        result = {
-          param: {
-            user_id: req.params.userId,
-          },
-          status: false,
-          message: "Could not delete User with id " + req.params.userId,
-          result: null,
-        };
-        res.status(500).send(result);
-      }
-    } else {
-      result = {
-        param: {
-          user_id: req.params.userId,
-        },
-        status: true,
-        message: `User was deleted successfully!`,
-        result: null,
-      };
-      res.send(result);
+exports.createUser = async function (req, res, next) {
+  try {
+    const { name, email, gender, phone_number } = req.body;
+    const users = await User.create({
+      name,
+      email,
+      gender,
+      phone_number,
+    });
+
+    var dataTransformed = fractal(users, userTransformer);
+    if (users) {
+      res.status(201).json({
+        status: "OK",
+        messages: "User berhasil ditambahkan",
+        results: dataTransformed,
+      });
     }
-  });
+  } catch (err) {
+    res.status(400).json({
+      status: "ERROR",
+      messages: err.message,
+      results: {},
+    });
+  }
 };
 
-// Delete all Users from the database.
-exports.deleteAll = (req, res) => {};
+exports.getUser = async function (req, res, next) {
+  try {
+    //get from auth jwt middleware
+    //let userIdLoggedIn = req.userId;
+    let userIdLoggedIn = 1;
+
+    const usersId = req.params.id;
+    const users = await User.findOne({
+      include: [db.posts],
+      where: {
+        id: usersId,
+      },
+    });
+    if (users.length !== 0) {
+      var dataTransformed = fractal(users, userTransformer);
+
+      res.json({
+        status: "OK",
+        messages: "",
+        userIdLoggedIn: userIdLoggedIn,
+        results: dataTransformed,
+      });
+    } else {
+      res.json({
+        status: "ERROR",
+        messages: "EMPTY",
+        results: {},
+      });
+    }
+  } catch (err) {
+    res.json({
+      status: "ERROR",
+      messages: err.message,
+      results: {},
+    });
+  }
+};
+
+exports.updateUser = async function (req, res, next) {
+  try {
+    const usersId = req.params.id;
+    const { name, email, gender, phone_number } = req.body;
+    const users = await User.update(
+      {
+        name,
+        email,
+        gender,
+        phone_number,
+      },
+      {
+        where: {
+          id: usersId,
+        },
+      }
+    );
+
+    const users_update = await User.findOne({
+      where: {
+        id: usersId,
+      },
+    });
+
+    var dataTransformed = fractal(users_update, userTransformer);
+    if (users) {
+      res.json({
+        status: "OK",
+        messages: "User berhasil diupdate",
+        results: dataTransformed,
+      });
+    }
+  } catch (err) {
+    res.status(400).json({
+      status: "ERROR",
+      messages: err.message,
+      results: {},
+    });
+  }
+};
+
+exports.deleteUser = async function (req, res, next) {
+  try {
+    const usersId = req.params.id;
+    const users = await User.destroy({
+      where: {
+        id: usersId,
+      },
+    });
+    if (users) {
+      res.json({
+        status: "OK",
+        messages: "User berhasil dihapus",
+        data: users,
+      });
+    }
+  } catch (err) {
+    res.status(400).json({
+      status: "ERROR",
+      messages: err.message,
+      data: {},
+    });
+  }
+};
